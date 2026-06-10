@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Filter, MoreVertical, Clock, Monitor, MapPin, Search, Calendar } from 'lucide-react';
+import { Plus, Filter, Clock, Monitor, MapPin, Search, Calendar } from 'lucide-react';
 import { entrevistasService } from '../services/entrevistas.service';
 import Toast from '../components/Toast';
 import { useAuth } from '../context/AuthContext';
@@ -201,14 +201,22 @@ export default function EntrevistasList() {
             const modLabel = modalidad.charAt(0).toUpperCase() + modalidad.slice(1);
             
             return (
-              <div key={entrevista?.id || index} style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '16px 24px',
-                gap: '24px',
-                borderBottom: isLast ? 'none' : '1px solid #F8F8F8',
-                position: 'relative'
-              }}>
+              <div 
+                key={entrevista?.id || index} 
+                onClick={() => navigate(`/entrevistas/${entrevista?.id}`)}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F9FAFB'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px 24px',
+                  gap: '24px',
+                  borderBottom: isLast ? 'none' : '1px solid #F8F8F8',
+                  position: 'relative',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+              >
                 {/* Borde izquierdo color estado */}
                 <div style={{ position: 'absolute', left: 0, top: '16px', bottom: '16px', width: '4px', backgroundColor: config.color, borderTopRightRadius: '4px', borderBottomRightRadius: '4px' }}></div>
                 
@@ -272,12 +280,31 @@ export default function EntrevistasList() {
                 </div>
 
                 {/* Columna 6: Acciones */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: '40px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: '100px' }}>
                   <button 
-                    onClick={() => navigate(`/entrevistas/${entrevista?.id}`)}
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: '4px', borderRadius: '4px' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/entrevistas/${entrevista?.id}`);
+                    }}
+                    style={{
+                      backgroundColor: '#7C3AED',
+                      border: 'none',
+                      borderRadius: '8px',
+                      color: 'white',
+                      padding: '6px 14px',
+                      fontSize: '0.8rem',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#6D28D9';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#7C3AED';
+                    }}
                   >
-                    <MoreVertical size={20} />
+                    Ver detalle
                   </button>
                 </div>
               </div>
