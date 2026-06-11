@@ -32,6 +32,10 @@ export const refresh = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie('refreshToken');
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Strict'
+  });
   res.json({ mensaje: 'Sesión cerrada correctamente' });
 };

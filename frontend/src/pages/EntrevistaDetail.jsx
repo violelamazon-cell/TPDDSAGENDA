@@ -131,6 +131,16 @@ export default function EntrevistaDetail() {
     );
   }
   
+  if (errorMsg && !entrevista) {
+    return (
+      <div style={{ padding: '60px', textAlign: 'center', color: '#EF4444' }}>
+        {errorMsg}
+        <br />
+        <button onClick={() => navigate('/entrevistas')} style={{ marginTop: '16px', padding: '8px 16px', borderRadius: '8px', border: '1px solid #E5E7EB', backgroundColor: 'white', cursor: 'pointer' }}>Volver</button>
+      </div>
+    );
+  }
+
   if (!entrevista) return null;
 
   const canCancel = isAdminOrRRHH && (entrevista.estado === 'programada' || entrevista.estado === 'reprogramada');

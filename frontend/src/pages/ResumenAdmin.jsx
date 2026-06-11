@@ -17,6 +17,9 @@ export default function ResumenAdmin() {
   }, []);
 
   if (loading) return <div style={{ padding: '60px', textAlign: 'center', color: '#6B7280' }}>Cargando resumen...</div>;
+  if (errorMsg && !resumen) {
+    return <div style={{ padding: '60px', textAlign: 'center', color: '#EF4444' }}>{errorMsg}</div>;
+  }
   if (!resumen) return null;
 
   const getStatusConfig = (estado) => {

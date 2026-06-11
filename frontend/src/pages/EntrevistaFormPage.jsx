@@ -21,6 +21,7 @@ export default function EntrevistaFormPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
   const [errorMsg, setErrorMsg] = useState('');
+  const [apiError, setApiError] = useState('');
 
   const [postulantes, setPostulantes] = useState([]);
   const [entrevistadores, setEntrevistadores] = useState([]);
@@ -62,6 +63,11 @@ export default function EntrevistaFormPage() {
     }
   }, [id, setValue, navigate, isEditing]);
 
+  useEffect(() => {
+    const subscription = watch(() => setApiError(''));
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     setErrorMsg('');
@@ -78,7 +84,8 @@ export default function EntrevistaFormPage() {
       }
       navigate('/entrevistas');
     } catch (err) {
-      setErrorMsg(err.response?.data?.error || 'Error al guardar la entrevista');
+      const mensaje = err.response?.data?.error || 'Error al guardar la entrevista';
+      setApiError(mensaje);
     } finally {
       setLoading(false);
     }
@@ -339,6 +346,24 @@ export default function EntrevistaFormPage() {
               />
             </div>
           </div>
+
+          {apiError && (
+            <div style={{
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              color: '#B91C1C',
+              fontSize: '0.9rem',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+              {apiError}
+            </div>
+          )}
 
           {/* Pie del formulario */}
           <div style={{

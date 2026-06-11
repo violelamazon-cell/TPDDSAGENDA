@@ -153,3 +153,41 @@ Solo se pueden programar entrevistas para postulantes en estado `nuevo` o `en_pr
 - `400` — Error de validación o regla de negocio
 - `404` — Recurso no encontrado
 - `500` — Error interno del servidor
+
+## Cómo probar las validaciones
+
+Iniciá sesión como admin (`admin@test.com` / `password123`) y andá a **Nueva Entrevista**.
+
+### 1. Superposición de horario
+- Seleccioná el entrevistador **Carlos Méndez**
+- Seleccioná la fecha **17/06/2026** (tiene una entrevista de 09:00 a 09:45)
+- Ingresá horaInicio: `09:00`, horaFin: `09:45`
+- Seleccioná cualquier postulante elegible
+- Hacé click en Guardar
+- **Resultado esperado:** error "El entrevistador ya tiene una entrevista en ese horario"
+
+### 2. Hora de fin menor o igual a hora de inicio
+- En el formulario de nueva entrevista, ingresá horaInicio: `10:00`, horaFin: `09:00`
+- Hacé click en Guardar
+- **Resultado esperado:** error "La hora de fin debe ser mayor que la hora de inicio"
+
+### 3. Postulante no elegible
+- En el formulario, seleccioná el postulante **Sofía Romero** (estado: rechazado) o **Diego Fernández** (estado: contratado)
+- Completá el resto de los campos válidos
+- Hacé click en Guardar
+- **Resultado esperado:** error "El postulante no está disponible para entrevistas"
+
+### 4. Modalidad virtual sin link
+- Seleccioná modalidad **Virtual**
+- Dejá el campo Link vacío
+- Hacé click en Guardar
+- **Resultado esperado:** error "Las entrevistas virtuales requieren un link"
+
+### 5. Acceso sin token (vía curl o Postman)
+- `GET http://localhost:3001/api/entrevistas` sin header Authorization
+- **Resultado esperado:** 401 `{ "error": "Token no proporcionado" }`
+
+### 6. Acceso con rol insuficiente
+- Iniciá sesión como entrevistador (`entrev1@test.com` / `password123`)
+- Intentá acceder a `/entrevistas/nueva`
+- **Resultado esperado:** redirige automáticamente a `/entrevistas`

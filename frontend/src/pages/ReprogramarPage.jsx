@@ -14,6 +14,7 @@ export default function ReprogramarPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+  const [apiError, setApiError] = useState('');
   const [entrevista, setEntrevista] = useState(null);
   const [entrevistadores, setEntrevistadores] = useState([]);
 
@@ -43,6 +44,11 @@ export default function ReprogramarPage() {
       .finally(() => setInitialLoading(false));
   }, [id, setValue, navigate]);
 
+  useEffect(() => {
+    const subscription = watch(() => setApiError(''));
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     setErrorMsg('');
@@ -55,7 +61,8 @@ export default function ReprogramarPage() {
       await entrevistasService.reprogramar(id, payload);
       navigate(`/entrevistas/${id}`);
     } catch (err) {
-      setErrorMsg(err.response?.data?.error || 'Error al reprogramar');
+      const mensaje = err.response?.data?.error || 'Error al reprogramar';
+      setApiError(mensaje);
     } finally {
       setLoading(false);
     }
@@ -317,6 +324,24 @@ export default function ReprogramarPage() {
               {errors.motivo && <p style={{ color: '#EF4444', fontSize: '0.8rem', margin: '4px 0 0 0' }}>{errors.motivo.message}</p>}
             </div>
           </div>
+
+          {apiError && (
+            <div style={{
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              color: '#B91C1C',
+              fontSize: '0.9rem',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '1.1rem' }}>⚠️</span>
+              {apiError}
+            </div>
+          )}
 
           {/* Pie del formulario */}
           <div style={{

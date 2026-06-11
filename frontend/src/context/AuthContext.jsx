@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '../services/auth.service';
 
 const AuthContext = createContext(null);
 
@@ -20,7 +21,12 @@ export function AuthProvider({ children }) {
     setAuth({ usuario, token, rol });
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (err) {
+      console.error('Error al cerrar sesión en el servidor', err);
+    }
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('usuario');
     sessionStorage.removeItem('rol');

@@ -11,6 +11,10 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
+    if (!error.response) {
+      // Error de red — backend no disponible
+      console.error('Error de red: el backend no está disponible');
+    }
     if (error.response?.status === 401) {
       sessionStorage.removeItem('accessToken');
       sessionStorage.removeItem('usuario');

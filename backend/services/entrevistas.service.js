@@ -219,12 +219,17 @@ export const editarEntrevista = async (id, datos, user) => {
     throw Object.assign(new Error('No se puede editar una entrevista cancelada'), { status: 400 });
   }
 
-  const valorAnterior = JSON.stringify({
-    fecha: entrevista.fecha, horaInicio: entrevista.horaInicio,
-    horaFin: entrevista.horaFin, modalidad: entrevista.modalidad,
-    ubicacion: entrevista.ubicacion, link: entrevista.link,
+  const valorAnteriorObj = {
+    fecha: entrevista.fecha, 
+    horaInicio: entrevista.horaInicio,
+    horaFin: entrevista.horaFin, 
+    modalidad: entrevista.modalidad,
+    ubicacion: entrevista.ubicacion, 
+    link: entrevista.link,
     observaciones: entrevista.observaciones,
-  });
+    entrevistadorId: entrevista.entrevistadorId
+  };
+  const valorAnterior = JSON.stringify(valorAnteriorObj);
 
   const { postulanteId, entrevistadorId, fecha, horaInicio, horaFin, modalidad, ubicacion, link, observaciones } = datos;
 
@@ -253,13 +258,24 @@ export const editarEntrevista = async (id, datos, user) => {
 
   await entrevista.save();
 
+  const valorNuevoObj = {
+    fecha: entrevista.fecha, 
+    horaInicio: entrevista.horaInicio,
+    horaFin: entrevista.horaFin, 
+    modalidad: entrevista.modalidad,
+    ubicacion: entrevista.ubicacion, 
+    link: entrevista.link,
+    observaciones: entrevista.observaciones,
+    entrevistadorId: entrevista.entrevistadorId
+  };
+
   await HistorialEntrevista.create({
     entrevistaId: id,
     usuarioId: user.id,
     accion: 'edicion',
     fechaHora: new Date().toISOString(),
     valorAnterior,
-    valorNuevo: JSON.stringify({ fecha: entrevista.fecha, horaInicio: entrevista.horaInicio, horaFin: entrevista.horaFin, modalidad: entrevista.modalidad }),
+    valorNuevo: JSON.stringify(valorNuevoObj),
   });
 
   return entrevista;
@@ -334,11 +350,18 @@ export const reprogramarEntrevista = async (id, datos, user) => {
   if (modalidad) validarModalidad(modalidad, ubicacion || entrevista.ubicacion, link || entrevista.link);
   await verificarSuperposicion(nuevoEntrevistador, nuevaFecha, nuevoInicio, nuevoFin, id);
 
-  const valorAnterior = JSON.stringify({
-    fecha: entrevista.fecha, horaInicio: entrevista.horaInicio,
-    horaFin: entrevista.horaFin, entrevistadorId: entrevista.entrevistadorId,
+  const valorAnteriorObj = {
+    fecha: entrevista.fecha, 
+    horaInicio: entrevista.horaInicio,
+    horaFin: entrevista.horaFin, 
+    entrevistadorId: entrevista.entrevistadorId,
     estado: entrevista.estado,
-  });
+    modalidad: entrevista.modalidad,
+    ubicacion: entrevista.ubicacion,
+    link: entrevista.link,
+    observaciones: entrevista.observaciones
+  };
+  const valorAnterior = JSON.stringify(valorAnteriorObj);
 
   entrevista.fecha = nuevaFecha;
   entrevista.horaInicio = nuevoInicio;
@@ -351,13 +374,25 @@ export const reprogramarEntrevista = async (id, datos, user) => {
   if (motivo) entrevista.observaciones = motivo;
   await entrevista.save();
 
+  const valorNuevoObj = {
+    fecha: entrevista.fecha, 
+    horaInicio: entrevista.horaInicio,
+    horaFin: entrevista.horaFin, 
+    entrevistadorId: entrevista.entrevistadorId,
+    estado: entrevista.estado,
+    modalidad: entrevista.modalidad,
+    ubicacion: entrevista.ubicacion,
+    link: entrevista.link,
+    observaciones: entrevista.observaciones
+  };
+
   await HistorialEntrevista.create({
     entrevistaId: id,
     usuarioId: user.id,
     accion: 'reprogramacion',
     fechaHora: new Date().toISOString(),
     valorAnterior,
-    valorNuevo: JSON.stringify({ fecha: nuevaFecha, horaInicio: nuevoInicio, horaFin: nuevoFin, entrevistadorId: nuevoEntrevistador, estado: 'reprogramada' }),
+    valorNuevo: JSON.stringify(valorNuevoObj),
   });
 
   return entrevista;
