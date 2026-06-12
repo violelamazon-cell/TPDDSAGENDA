@@ -12,8 +12,6 @@ const loginLimiter = rateLimit({
   message: { error: 'Demasiados intentos, intente en 15 minutos' },
 });
 
-const router = Router();
-
 router.post('/register',
   validate([
     body('nombre').notEmpty().withMessage('El nombre es obligatorio'),
