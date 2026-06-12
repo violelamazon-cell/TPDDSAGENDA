@@ -20,34 +20,52 @@ router.get('/:id/historial', ctrl.obtenerHistorial);
 router.post('/',
   authorizeRole('admin', 'rrhh'),
   validate([
-    body('postulanteId').notEmpty().withMessage('El postulante es obligatorio'),
-    body('entrevistadorId').notEmpty().withMessage('El entrevistador es obligatorio'),
-    body('fecha').isDate().withMessage('La fecha es obligatoria y debe ser válida'),
-    body('horaInicio').notEmpty().withMessage('La hora de inicio es obligatoria'),
-    body('horaFin').notEmpty().withMessage('La hora de fin es obligatoria'),
-    body('modalidad').isIn(['presencial', 'virtual']).withMessage('La modalidad debe ser presencial o virtual'),
+    body('postulanteId').isInt({ min: 1 }).withMessage('postulanteId debe ser un número entero positivo'),
+    body('entrevistadorId').isInt({ min: 1 }).withMessage('entrevistadorId requerido'),
+    body('fecha').isDate().withMessage('fecha debe tener formato YYYY-MM-DD'),
+    body('horaInicio').matches(/^\d{2}:\d{2}$/).withMessage('horaInicio debe tener formato HH:mm'),
+    body('horaFin').matches(/^\d{2}:\d{2}$/).withMessage('horaFin debe tener formato HH:mm'),
+    body('modalidad').isIn(['presencial', 'virtual']).withMessage('modalidad debe ser presencial o virtual'),
   ]),
   ctrl.crear
 );
 
 router.put('/:id',
   authorizeRole('admin', 'rrhh'),
+  validate([
+    body('postulanteId').optional().isInt({ min: 1 }).withMessage('postulanteId debe ser un número entero positivo'),
+    body('entrevistadorId').optional().isInt({ min: 1 }).withMessage('entrevistadorId debe ser un número entero positivo'),
+    body('fecha').optional().isDate().withMessage('fecha debe tener formato YYYY-MM-DD'),
+    body('horaInicio').optional().matches(/^\d{2}:\d{2}$/).withMessage('horaInicio debe tener formato HH:mm'),
+    body('horaFin').optional().matches(/^\d{2}:\d{2}$/).withMessage('horaFin debe tener formato HH:mm'),
+    body('modalidad').optional().isIn(['presencial', 'virtual']).withMessage('modalidad debe ser presencial o virtual'),
+  ]),
   ctrl.editar
 );
 
 router.patch('/:id/cancelar',
   authorizeRole('admin', 'rrhh'),
+  validate([
+    body('motivo').optional().isString().withMessage('El motivo debe ser un texto'),
+  ]),
   ctrl.cancelar
 );
 
-router.patch('/:id/realizar', ctrl.realizar);
+router.patch('/:id/realizar',
+  validate([
+    body('observaciones').optional().isString().withMessage('Las observaciones deben ser texto'),
+  ]),
+  ctrl.realizar
+);
 
 router.patch('/:id/reprogramar',
   authorizeRole('admin', 'rrhh'),
   validate([
-    body('fecha').optional().isDate().withMessage('La fecha debe ser válida'),
-    body('horaInicio').optional().notEmpty().withMessage('La hora de inicio no puede estar vacía'),
-    body('horaFin').optional().notEmpty().withMessage('La hora de fin no puede estar vacía'),
+    body('fecha').optional().isDate().withMessage('fecha debe tener formato YYYY-MM-DD'),
+    body('horaInicio').optional().matches(/^\d{2}:\d{2}$/).withMessage('horaInicio debe tener formato HH:mm'),
+    body('horaFin').optional().matches(/^\d{2}:\d{2}$/).withMessage('horaFin debe tener formato HH:mm'),
+    body('entrevistadorId').optional().isInt({ min: 1 }).withMessage('entrevistadorId debe ser un número entero positivo'),
+    body('modalidad').optional().isIn(['presencial', 'virtual']).withMessage('modalidad debe ser presencial o virtual'),
   ]),
   ctrl.reprogramar
 );

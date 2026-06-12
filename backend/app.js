@@ -1,12 +1,11 @@
 // IMPORTANTE: express-async-errors DEBE importarse antes de cualquier ruta o middleware
 // para que Supertest funcione correctamente al importar app.js directamente
 import 'express-async-errors';
-
+import 'dotenv/config';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 
 import authRouter from './routes/auth.routes.js';
 import entrevistasRouter from './routes/entrevistas.routes.js';
@@ -14,7 +13,6 @@ import postulantesRouter from './routes/postulantes.routes.js';
 import usuariosRouter from './routes/usuarios.routes.js';
 import errorHandler from './middlewares/error.middleware.js';
 
-dotenv.config();
 
 const app = express();
 

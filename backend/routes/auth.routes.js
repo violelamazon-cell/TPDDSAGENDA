@@ -1,7 +1,16 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
+import rateLimit from 'express-rate-limit';
 import { validate } from '../middlewares/validate.middleware.js';
 import { register, login, refresh, logout } from '../controllers/auth.controller.js';
+
+const router = Router();
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Demasiados intentos, intente en 15 minutos' },
+});
 
 const router = Router();
 
@@ -15,6 +24,7 @@ router.post('/register',
 );
 
 router.post('/login',
+  loginLimiter,
   validate([
     body('email').isEmail().withMessage('Email inválido'),
     body('password').notEmpty().withMessage('La contraseña es obligatoria'),

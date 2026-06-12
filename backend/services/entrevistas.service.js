@@ -157,7 +157,7 @@ export const crearEntrevista = async (datos, usuarioId) => {
 
   // Validaciones de negocio
   validarHorario(horaInicio, horaFin);
-  await validarPostulanteElegible(postulanteId);
+  const postulante = await validarPostulanteElegible(postulanteId);
   validarModalidad(modalidad, ubicacion, link);
   await verificarSuperposicion(entrevistadorId, fecha, horaInicio, horaFin);
 
@@ -182,6 +182,11 @@ export const crearEntrevista = async (datos, usuarioId) => {
     valorAnterior: null,
     valorNuevo: JSON.stringify({ postulanteId, entrevistadorId, fecha, horaInicio, horaFin, modalidad }),
   });
+
+  // Actualizar estado del postulante si es nuevo
+  if (postulante.estado === 'nuevo') {
+    await postulante.update({ estado: 'en_proceso' });
+  }
 
   return entrevista;
 };
@@ -430,10 +435,10 @@ export const obtenerResumen = async () => {
     attributes: ['id', 'nombre'],
   });
 
-  const porEntrevistador = await Promise.all(
+  const cargaPorEntrevistador = await Promise.all(
     entrevistadores.map(async (ent) => {
-      const cantidad = await Entrevista.count({ where: { entrevistadorId: ent.id } });
-      return { id: ent.id, nombre: ent.nombre, cantidad };
+      const total = await Entrevista.count({ where: { entrevistadorId: ent.id } });
+      return { id: ent.id, nombre: ent.nombre, total };
     })
   );
 
@@ -442,7 +447,7 @@ export const obtenerResumen = async () => {
     totalHoy: entrevistasHoy.length,
     postulantesEnProceso,
     entrevistasCanceladas,
-    realizadasMes,
-    porEntrevistador,
+    realizadasEsteMes: realizadasMes,
+    cargaPorEntrevistador,
   };
 };
